@@ -7,13 +7,14 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
+
 # --- Game configuration ---
 DEFAULT_NB_PLAYERS = 6  # requirement: exactly 6 players by default
 ROWS, COLS = 20, 30
 STAR_COUNT = 50
 
 # Worker pool to safely run user move functions with a timeout
-_executor = concurrent.futures.ProcessPoolExecutor(max_workers=DEFAULT_NB_PLAYERS)
+_executor = concurrent.futures.ThreadPoolExecutor(max_workers=DEFAULT_NB_PLAYERS) # 変更後
 
 # Per-game state (allows many simultaneous viewers/games)
 # game_id -> {"scores": [...], "nb_players": int}
