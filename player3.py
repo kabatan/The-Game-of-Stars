@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 thisplayer=2
 playernum=6
-rounds=1000
+rounds=100
 decay=0.01**(1/rounds)
 collected=[]
 
