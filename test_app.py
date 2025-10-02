@@ -1,4 +1,4 @@
-# ---------- test_app.py (server) ----------
+# ---------- test_app.py (修正版) ----------
 import random
 import importlib
 import concurrent.futures
@@ -9,15 +9,17 @@ app = Flask(__name__)
 
 
 # --- Game configuration ---
-DEFAULT_NB_PLAYERS = 6  # requirement: exactly 6 players by default
+DEFAULT_NB_PLAYERS = 6
 ROWS, COLS = 20, 30
 STAR_COUNT = 50
 
 # Worker pool to safely run user move functions with a timeout
-_executor = concurrent.futures.ThreadPoolExecutor(max_workers=DEFAULT_NB_PLAYERS) # 変更後
+# ThreadPoolExecutorのままで問題ありません
+_executor = concurrent.futures.ThreadPoolExecutor(max_workers=DEFAULT_NB_PLAYERS)
 
 # Per-game state (allows many simultaneous viewers/games)
-# game_id -> {"scores": [...], "nb_players": int}
+# ★変更点: ゲームごとに星の状態(stars)もサーバーサイドで管理する
+# game_id -> {"scores": [...], "nb_players": int, "stars": set((r, c), ...)}
 GAMES = {}
 
 # --- Load player move functions (player1.py .. player6.py). Fallback: stay in place ---
@@ -36,9 +38,7 @@ for i in range(1, DEFAULT_NB_PLAYERS + 1):
 
 
 def generate_initial_positions(nb_players: int):
-    """Create random player positions (pairwise Manhattan >=5) and STAR_COUNT star tiles
-    that start at Manhattan >4 from all players.
-    """
+    """Create random player positions and star tiles."""
     players = []
     while len(players) < nb_players:
         r, c = random.randint(0, ROWS - 1), random.randint(0, COLS - 1)
@@ -56,55 +56,57 @@ def generate_initial_positions(nb_players: int):
 
 @app.route("/")
 def index():
-    # Serves index.html from the template folder
     return render_template("index.html")
 
 
-@app.route("/start", methods=["POST"])  # changed to POST with JSON
+@app.route("/start", methods=["POST"])
 def start():
-    """Start a new game instance and return its game_id and initial state.
-    Allows many concurrent games (multi-viewers)."""
+    """Start a new game instance and return its game_id and initial state."""
     payload = request.get_json(silent=True) or {}
     nb_players = int(payload.get("nbplayers", DEFAULT_NB_PLAYERS))
-    # Force exactly 6 players, as requested
     nb_players = DEFAULT_NB_PLAYERS
 
     players, stars = generate_initial_positions(nb_players)
-
     game_id = uuid.uuid4().hex
+    
+    # ★変更点: 星の状態をsetとしてサーバーで保持する
     GAMES[game_id] = {
         "scores": [0] * nb_players,
         "nb_players": nb_players,
+        "stars": set(tuple(s) for s in stars),
     }
     return jsonify(game_id=game_id, players=players, stars=stars, scores=GAMES[game_id]["scores"])
 
 
 @app.route("/move", methods=["POST"])
 def move():
-    """Compute one simulation step with tie-breaking and occupancy rules.
-
-    Rules:
-    1) Exactly 6 players.
-    2) If two or more players target the same tile, pick one at random; others stay.
-    3) A player cannot move into an occupied tile unless the current occupant also moves away this turn.
-       (Swaps are allowed if both move.)
-    """
+    """Compute one simulation step with server-side state management."""
     data = request.get_json() or {}
     game_id = data.get("game_id")
     if not game_id or game_id not in GAMES:
         return jsonify(error="invalid game_id"), 400
 
     players = [tuple(p) for p in data.get("players", [])]
-    stars = [tuple(l) for l in data.get("stars", [])]
+    game_state = GAMES[game_id]
+    
+    # ★変更点: クライアントから送られた星リストは無視し、サーバーが管理する最新の星の状態を使う
+    current_stars_set = game_state["stars"]
+    current_stars_list = list(current_stars_set)
 
     # 1) Ask each move function for a proposed move, with timeout and validation
     proposed = []
+    futures = []
     for idx, fn in enumerate(move_functions):
+        # ★変更点: AIにはサーバーが管理する最新の星リストを渡す
+        future = _executor.submit(fn, players, current_stars_list)
+        futures.append(future)
+
+    for idx, future in enumerate(futures):
         try:
-            future = _executor.submit(fn, players, stars)
             new_coord = future.result(timeout=1.0)
         except Exception:
             new_coord = players[idx]
+        
         # Validate: single orthogonal step or stay; inside bounds
         r0, c0 = players[idx]
         r1, c1 = new_coord if isinstance(new_coord, (list, tuple)) and len(new_coord) == 2 else (r0, c0)
@@ -113,51 +115,49 @@ def move():
         else:
             proposed.append((r0, c0))
 
-    old_positions = players[:]  # before movement
-
-    # 2) Resolve same-target conflicts randomly (only one winner per target)
+    # 2) Resolve same-target conflicts randomly
+    # (このセクションは変更なし)
     target_to_indices = {}
     for i, tgt in enumerate(proposed):
         target_to_indices.setdefault(tgt, []).append(i)
 
-    winners = set()  # indices allowed to move to their target after tie-break
+    winners = set()
     for tgt, idxs in target_to_indices.items():
         if len(idxs) == 1:
             winners.add(idxs[0])
         else:
-            # More than one player wants this tile: random winner, others stay
             winner = random.choice(idxs)
             winners.add(winner)
-            # non-winners implicitly stay because they won't be in winners set
 
-    # 3) Enforce occupancy rule: cannot enter a tile if its current occupant stays
-    #    (i.e., occupant is NOT moving away after tie-break)
-    will_move = [False] * len(proposed)
-    for i in range(len(proposed)):
-        will_move[i] = (i in winners) and (proposed[i] != old_positions[i])
+    # 3) Enforce occupancy rule
+    # (このセクションは変更なし)
+    will_move = [(i in winners and proposed[i] != players[i]) for i in range(len(proposed))]
+    vacating = {players[i]: will_move[i] for i in range(len(players))}
 
-    # Determine, for each old tile, whether its occupant vacates it
-    vacating = {old_positions[i]: will_move[i] for i in range(len(old_positions))}
-
-    final_positions = list(old_positions)
+    final_positions = list(players)
     for i in range(len(proposed)):
         if not will_move[i]:
-            continue  # stays in place
+            continue
         target = proposed[i]
-        # If target equals some player's old position and that player is NOT vacating, block the move
         if target in vacating and not vacating[target]:
-            continue  # blocked: stays at old position
-        # Otherwise the move is allowed
+            continue
         final_positions[i] = target
 
-    # 4) Update score if landing on stars (star removal is handled on client)
-    scores = GAMES[game_id]["scores"]
-    star_set = set(stars)
-    for idx, pos in enumerate(final_positions):
-        if pos in star_set:
-            scores[idx] += 1
+    # 4) Update score and server-side star state
+    scores = game_state["scores"]
+    captured_stars = set()
 
-    return jsonify(coord=final_positions, scores=scores)
+    for idx, pos in enumerate(final_positions):
+        # ★変更点: サーバー管理の星セット(current_stars_set)に対してチェック
+        if pos in current_stars_set:
+            scores[idx] += 1
+            captured_stars.add(pos)
+
+    # ★変更点: 取得された星をサーバーの状態から削除
+    current_stars_set.difference_update(captured_stars)
+
+    # ★変更点: APIのレスポンスに、更新後の最新の星リストを追加
+    return jsonify(coord=final_positions, scores=scores, stars=list(current_stars_set))
 
 
 if __name__ == "__main__":
