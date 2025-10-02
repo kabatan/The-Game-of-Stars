@@ -4,7 +4,7 @@
 
 import math, random, time
 
-import TIMEOUT from var
+from var import TIMEOUT
 
 ROWS, COLS = 20, 30
 MY_IDX = 4  # player5 (0-indexed)

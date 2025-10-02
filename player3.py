@@ -1,8 +1,7 @@
 import random
 import heapq
 import time
-
-import TIMEOUT from var
+from var import TIMEOUT
 
 DEFAULT_NB_PLAYERS = 6  # requirement: exactly 6 players by default
 ROWS, COLS = 20, 30

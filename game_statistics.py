@@ -7,7 +7,7 @@ from collections import defaultdict
 from typing import List, Tuple, Dict, Any
 import multiprocessing as mp
 import sys
-import TIMEOUT from var
+from var import TIMEOUT
 
 # --- Game configuration ---
 DEFAULT_NB_PLAYERS = 6
