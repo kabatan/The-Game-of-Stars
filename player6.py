@@ -2,6 +2,8 @@ import random
 import heapq
 import time
 
+import TIMEOUT from var
+
 DEFAULT_NB_PLAYERS = 6  # requirement: exactly 6 players by default
 ROWS, COLS = 20, 30
 STAR_COUNT = 50
@@ -142,7 +144,7 @@ def move6(players, stars):
     else:
         update_graph(players)
 
-    end_time = time.perf_counter() + 0.8
+    end_time = time.perf_counter() + TIMEOUT*0.8
 
     best_score = [0]*len(players)
     best_route = [[] for _ in range(len(players))]

@@ -1,4 +1,4 @@
-def move2(players, stars):
+def move1(players, stars):
     """
     players: list of (r, c) current positions for all 6 players
     stars: list of (r, c) star positions

@@ -2,14 +2,15 @@ import random
 import heapq
 import time
 
+import TIMEOUT from var
+
 DEFAULT_NB_PLAYERS = 6  # requirement: exactly 6 players by default
 ROWS, COLS = 20, 30
 STAR_COUNT = 50
 PLAYER_ID = 5
 ALPHA = 1.0
-BETA = 2.0
+BETA = 1.0
 RHO = 0.1
-Q = 1.0
 PHEROMONE_MIN = 0.1
 star_list = []
 star_graph = []
@@ -20,11 +21,18 @@ def choose_v(player_idx, v, rest_stars):
     global pheromone
     total_value = 0.0
     choise = []
+    dist_max=0, dist_min=100000
+    for to in range(STAR_COUNT):
+        if (rest_stars[to]):
+            dist = star_graph[v][to]
+            if (dist>dist_max): dist_max=dist
+            if (dist<dist_min): dist_min=dist
+
     for to in range(STAR_COUNT):
         if (rest_stars[to]):
             tau = max(pheromone[player_idx][v][to], PHEROMONE_MIN)
             dist = star_graph[v][to]
-            value = (tau**ALPHA) * ((Q/(dist+0.1))**BETA)
+            value = (tau**ALPHA) * ((1-(dist-dist_min)/(dist_max-dist_min))**BETA)
             choise.append((to, value))
             total_value += value
         else: 
@@ -92,8 +100,8 @@ def init(players, stars):
             star_graph[i][j] = d
             star_graph[j][i] = d
             for k in range(len(players)):
-                pheromone[k][i][j] = max(Q/(star_graph[i][j]+0.1), PHEROMONE_MIN)
-                pheromone[k][j][i] = max(Q/(star_graph[i][j]+0.1), PHEROMONE_MIN)
+                pheromone[k][i][j] = PHEROMONE_MIN
+                pheromone[k][j][i] = PHEROMONE_MIN
 
 def update_graph(players):
     global star_list, star_graph, valid_stars
@@ -133,7 +141,7 @@ def is_new_game(stars):
     return False
             
 
-def move6(players, stars):
+def move4(players, stars):
 
     global star_list, pheromone, valid_stars
 
@@ -142,7 +150,7 @@ def move6(players, stars):
     else:
         update_graph(players)
 
-    end_time = time.perf_counter() + 0.8
+    end_time = time.perf_counter() + TIMEOUT*0.8
 
     best_score = [0]*len(players)
     best_route = [[] for _ in range(len(players))]
