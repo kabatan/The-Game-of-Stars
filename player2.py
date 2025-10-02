@@ -7,7 +7,7 @@ from var import TIMEOUT
 DEFAULT_NB_PLAYERS = 6  # requirement: exactly 6 players by default
 ROWS, COLS = 20, 30
 STAR_COUNT = 50
-PLAYER_ID = 5
+PLAYER_ID = 1
 ALPHA = 1.0
 BETA = 2.0
 RHO = 0.1
@@ -144,7 +144,7 @@ def move2(players, stars):
     else:
         update_graph(players)
 
-    end_time = time.perf_counter() + TIME_OUT*0.8
+    end_time = time.perf_counter() + TIMEOUT*0.8
 
     best_score = [0]*len(players)
     best_route = [[] for _ in range(len(players))]

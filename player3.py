@@ -6,7 +6,7 @@ from var import TIMEOUT
 DEFAULT_NB_PLAYERS = 6  # requirement: exactly 6 players by default
 ROWS, COLS = 20, 30
 STAR_COUNT = 50
-PLAYER_ID = 5
+PLAYER_ID = 2
 ALPHA = 1.0
 BETA = 2.0
 RHO = 0.1
@@ -20,7 +20,7 @@ def choose_v(player_idx, v, rest_stars):
     global pheromone
     total_value = 0.0
     choise = []
-    dist_max=0, dist_min=100000
+    dist_max, dist_min = 0, 10000000
     for to in range(STAR_COUNT):
         if (rest_stars[to]):
             dist = star_graph[v][to]
@@ -31,7 +31,9 @@ def choose_v(player_idx, v, rest_stars):
         if (rest_stars[to]):
             tau = max(pheromone[player_idx][v][to], PHEROMONE_MIN)
             dist = star_graph[v][to]
-            value = (tau**ALPHA) * ((1-(dist-dist_min)/(dist_max-dist_min))**BETA)
+            value = tau**ALPHA
+            if (dist_max != dist_min):
+                value *= ((1-(dist-dist_min)/(dist_max-dist_min))**BETA)
             choise.append((to, value))
             total_value += value
         else: 
@@ -149,7 +151,7 @@ def move3(players, stars):
     else:
         update_graph(players)
 
-    end_time = time.perf_counter() + TIME_OUT*0.8
+    end_time = time.perf_counter() + TIMEOUT*0.8
 
     best_score = [0]*len(players)
     best_route = [[] for _ in range(len(players))]

@@ -5,7 +5,7 @@ def move1(players, stars):
     return: (r, c) new position for player 2 (max 1 orthogonal step or stay)
     """
 
-    r, c = players[1]
+    r, c = players[0]
 
     closest_star = None
     closest_mandist = 10000
