@@ -10,6 +10,7 @@ ALPHA = 1.0
 BETA = 2.0
 RHO = 0.1
 Q = 1.0
+PHEROMONE_MIN = 0.1
 star_list = []
 star_graph = []
 pheromone = []
@@ -21,9 +22,9 @@ def choose_v(player_idx, v, rest_stars):
     choise = []
     for to in range(STAR_COUNT):
         if (rest_stars[to]):
-            tau = pheromone[player_idx][v][to]
+            tau = max(pheromone[player_idx][v][to], PHEROMONE_MIN)
             dist = star_graph[v][to]
-            value = (tau**ALPHA) * ((Q/(dist+1))**BETA)
+            value = (tau**ALPHA) * ((Q/(dist+0.1))**BETA)
             choise.append((to, value))
             total_value += value
         else: 
@@ -91,8 +92,8 @@ def init(players, stars):
             star_graph[i][j] = d
             star_graph[j][i] = d
             for k in range(len(players)):
-                pheromone[k][i][j] = 1.0
-                pheromone[k][j][i] = 1.0 
+                pheromone[k][i][j] = max(Q/(star_graph[i][j]+0.1), PHEROMONE_MIN)
+                pheromone[k][j][i] = max(Q/(star_graph[i][j]+0.1), PHEROMONE_MIN)
 
 def update_graph(players):
     global star_list, star_graph, valid_stars
