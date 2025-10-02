@@ -37,7 +37,7 @@ def move4(players, stars):
     global collected
 
     if len(pheromones)==0:
-        print("init")
+        #print("init")
         maxdis=0
         mindis=10**9
         for x in stars:
@@ -136,7 +136,7 @@ def move4(players, stars):
         successes+=len(collected[thisplayer])
         data.append(len(collected[thisplayer]))
         maxsucc=max(maxsucc,len(collected[thisplayer]))
-    print(successes/rounds, maxsucc) 
+    #print(successes/rounds, maxsucc) 
     #plt.plot(data)
     #plt.show()       
     if len(collected[thisplayer])!=0:

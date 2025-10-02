@@ -127,7 +127,7 @@ while len(starpos) > 0 and moveloop<maxmoves:
 
     # --- Player moves ---
     wishes = {}
-    for i in range(6):
+    for i in range(4):
         wish = eval(f"player{i+1}.move{i+1}(playerpos,starpos)")  # returns (x,y)
         wishes.setdefault(str(wish), [])
         wishes[str(wish)].append(i)
