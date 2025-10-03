@@ -1,7 +1,7 @@
 from kmeanslib import kmeans
 
 
-def kmeans_repeat(star_list):
+def make_graph(star_list):
     KRASTERS_NUM = 5
     MAX_KRASTER_DIST = 10
     krasters, maxdist, kraster_centers = kmeans(star_list, KRASTERS_NUM, MAX_KRASTER_DIST)
@@ -9,9 +9,7 @@ def kmeans_repeat(star_list):
         KRASTERS_NUM += 1
         krasters, maxdist, kraster_centers = kmeans(star_list, INITIAL_KRASTERS, MAX_KRASTER_DIST)
 
-    return krasters, maxdist, kraster_centers
-    
-def make_graph(starlist, krasters, maxdist, kraster_centers):
+
     kraster_graph = [[0 for _ in range(len(krasters))] for _ in range(len(krasters))]
     for i in range(len(krasters)):
         r1,c1 = kraster_centers[i]
