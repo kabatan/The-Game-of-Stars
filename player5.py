@@ -4,9 +4,8 @@
 
 import math, random, time
 
-from var import TIMEOUT
+from var import TIMEOUT, STAR_COUNT,DEFAULT_NB_PLAYERS,ROWS,COLS
 
-ROWS, COLS = 20, 30
 MY_IDX = 4  # player5 (0-indexed)
 
 # -------- Hyperparameters --------
