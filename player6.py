@@ -11,7 +11,9 @@ ALPHA = 1.0
 BETA = 2.0
 RHO = 0.1
 Q = 1.0
-PHEROMONE_MIN = 0.1
+PHEROMONE_MIN = 1.0
+PHEROMONE_MAX = 10000.0
+SIMULATETIMES = 10
 
 ''' STATE_FILE = f'player_{PLAYER_ID}_state.pkl' '''
 
@@ -32,6 +34,7 @@ def load_state():
     with open(STATE_FILE, 'rb') as f:
         bot_state = pickle.load(f)
 '''
+
 
 def choose_v(player_idx, v, rest_stars):
     global bot_state
@@ -94,7 +97,6 @@ def simulate(ants):
 
     return scores, player_route
 
-
 def init(players, stars):
     global bot_state
     bot_state["star_list"] = stars
@@ -150,17 +152,26 @@ def is_new_game(stars):
                 break
         if (flag): return True
     return False
-            
+
+
+def pheromone_check():
+    global bot_state
+    for i in range(len(bot_state["pheromone"])):
+        for j in range(len(bot_state["pheromone"][i])):
+            for k in range(len(bot_state["pheromone"][i][j])):
+                if bot_state["pheromone"][i][j][k] < PHEROMONE_MIN:
+                    bot_state["pheromone"][i][j][k] = PHEROMONE_MIN  
+                elif bot_state["pheromone"][i][j][k] > PHEROMONE_MAX:
+                    bot_state["pheromone"][i][j][k] = PHEROMONE_MAX    
+
 
 def move6(players, stars):
 
     global bot_state
-
     '''
     if (os.path.exists(STATE_FILE)):
         load_state()
     '''
-
     if (is_new_game(stars)):
         init(players, stars)
     else:
@@ -170,22 +181,37 @@ def move6(players, stars):
 
     best_score = [0]*len(players)
     best_route = [[] for _ in range(len(players))]
+
+    times = 0
     
     while time.perf_counter() < end_time:
-        scores, player_route = simulate(players)
-        for i in range(len(players)):
-            if (scores[i] > best_score[i]):
-                best_score[i] = scores[i]
-                best_route[i] = player_route[i]
+        good_score = [0]*len(players)
+        good_route = [[] for _ in range(len(players))]
+        for _ in range(SIMULATETIMES):
+            scores, player_route = simulate(players)
+            for i in range(len(players)):
+                if (scores[i] > good_score[i]):
+                    good_score[i] = scores[i]
+                    good_route[i] = player_route[i]
+
+            times += 1
+
 
         for i in range(len(players)):
-            if (scores[i] > 0):
-                route = player_route[i]
+            if (good_score[i] > 0):
+                route = good_route[i]
                 for j in range(1, len(route)):
                     v = route[j-1]
                     to = route[j]
-                    bot_state["pheromone"][i][v][to] += scores[i]
-                    bot_state["pheromone"][i][to][v] += scores[i]
+                    bot_state["pheromone"][i][v][to] += good_score[i]
+                    bot_state["pheromone"][i][to][v] += good_score[i]
+
+            if (good_score[i] > best_score[i]):
+                best_score[i] = good_score[i]
+                best_route[i] = good_route[i]
+
+
+        pheromone_check()
 
     for i in range(len(players)):
         for j in range(len(bot_state["star_list"])+len(players)):
@@ -193,5 +219,7 @@ def move6(players, stars):
                 bot_state["pheromone"][i][j][k] *= (1.0 - RHO)
     
     '''save_state()'''
+
+    print(f"player{PLAYER_ID} simulate times: {times}", flush=True)
 
     return move_to_star(players[PLAYER_ID], bot_state["star_list"][best_route[PLAYER_ID][1]]) if len(best_route[PLAYER_ID])>1 else players[PLAYER_ID]
