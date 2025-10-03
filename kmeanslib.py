@@ -1,4 +1,7 @@
 import random
+import pygame
+import sys
+import time
 
 
 LOOPNUM=20
@@ -29,7 +32,6 @@ def kmeans(star_list, K):
             mindist=1000
             minj=-1
             for j in range(K):
-                print(starpos)
                 dist=rectdist(starpos,clustercenter[j])
                 if dist<mindist:
                     mindist=dist
@@ -59,5 +61,60 @@ def kmeans(star_list, K):
     return [clusters, global_maxdist, clustercenter]
             
 
-        
 
+
+
+
+
+
+def kmeansvisualize(clusters, star_list):
+
+    pygame.init()
+    cellsize=10
+    gridsize=(30,20)
+    screen = pygame.display.set_mode((gridsize[0] * cellsize, gridsize[1] * cellsize))
+
+    COLORS = {
+    0: (255, 0, 0),       # player 0 = red
+    1: (0, 255, 0),       # player 1 = green
+    2: (0, 0, 255),       # player 2 = blue
+    3: (255, 165, 0),     # player 3 = orange
+    4: (128, 0, 128),     # player 4 = purple
+    5: (0, 255, 255),     # player 5 = cyan
+    6: (255, 20, 146),    # player 6 = pink
+}
+
+
+    
+    grid=[]
+    for i in range(gridsize[1]):
+        grid.append([])
+        for j in range(gridsize[0]):
+            grid[-1].append(-1)
+    
+    screen.fill((0, 0, 0))  # background black
+
+    for i,c in enumerate(clusters):
+        for j in c:
+            grid[star_list[j][0]][star_list[j][1]]=i
+
+
+
+    for y, row in enumerate(grid):
+        for x, cell in enumerate(row):
+            color = COLORS.get(cell, (200, 200, 200))  # default gray
+            rect = pygame.Rect(x * cellsize, y * cellsize, cellsize, cellsize)
+
+        
+            pygame.draw.rect(screen, color, rect)
+            pygame.draw.rect(screen, (50, 50, 50), rect, 1)
+    pygame.display.flip()
+    time.sleep(100)
+    
+
+   """  
+l=[[0,1],[1,1],[3,1],[10,10]]
+c,maxd,m=kmeans(l,2)
+kmeansvisualize(c,l)"""
+    
+        
