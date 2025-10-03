@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +11,28 @@
     #btn-start { background: #3498db; color: #fff; border: none; padding: 12px 24px; font-size: 18px; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background 0.3s; }
     #btn-start:hover { background: #2980b9; }
     .game-wrapper { display: flex; gap: 20px; align-items: flex-start; }
-    #board { display: grid; grid-template-columns: repeat(30, 24px); grid-template-rows: repeat(20, 24px); gap: 1px; background: #333; padding: 1px; }
+    
+    /* ボードとキャンバスを重ねるためのコンテナ */
+    #board-container {
+      position: relative;
+    }
+    #board { 
+      display: grid; 
+      grid-template-columns: repeat(30, 24px); 
+      grid-template-rows: repeat(20, 24px); 
+      gap: 1px; 
+      background: #333; 
+      padding: 1px;
+    }
+    /* 盤面の上に重ねるキャンバスのスタイル */
+    #route-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none; /* キャンバスがクリックイベントを邪魔しないようにする */
+      z-index: 10;
+    }
+    
     .cell { width: 24px; height: 24px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; user-select: none; }
     .star { font-size: 16px; color: gold; }
     .player1 { color: #e74c3c; } .player2 { color: #3498db; } .player3 { color: #2ecc71; }
@@ -29,26 +50,33 @@
   </div>
 
   <div class="game-wrapper">
-    <div id="board"></div>
+    <div id="board-container">
+      <div id="board"></div>
+      <canvas id="route-canvas"></canvas>
+    </div>
     <div id="scoreboard">
       <h2>Scores</h2>
       <ul id="scores-list"></ul>
     </div>
   </div>
 
-  <script>
-    // Exactly 6 players
+<script>
     const NB_PLAYERS = 6;
     const rows = 20, cols = 30;
 
-    let players = [], stars = [], scores = [], loop = 0;
+    // 新しい変数を追加
+    let players = [], stars = [], scores = [], routes = [], loop = 0;
     let gameInterval = null;
-    let gameId = null; // unique id per game so multiple viewers can run their own session
+    let gameId = null; 
 
     const boardEl = document.getElementById('board');
+    // キャンバス関連の変数を追加
+    const canvasEl = document.getElementById('route-canvas');
+    const ctx = canvasEl.getContext('2d');
+    const playerColors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+
 
     document.getElementById('btn-start').addEventListener('click', async () => {
-      // Create a new game on the server (returns a game_id)
       const resp = await fetch('start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,8 +85,9 @@
       const data = await resp.json();
       gameId  = data.game_id;
       players = data.players;
-      stars    = data.stars;
+      stars   = data.stars;
       scores  = data.scores;
+      routes  = []; // 開始時はルート情報をリセット
       loop    = 0;
 
       initBoard();
@@ -78,9 +107,15 @@
           boardEl.appendChild(cell);
         }
       }
+      // キャンバスのサイズをボードに合わせる
+      // スタイルではなく属性でサイズを設定することが重要
+      const boardRect = boardEl.getBoundingClientRect();
+      canvasEl.width = boardRect.width;
+      canvasEl.height = boardRect.height;
     }
 
     function draw() {
+      // セルの描画 (キャラクターや星)
       document.querySelectorAll('.cell').forEach(cell => {
         cell.textContent = '';
         cell.classList.remove('star');
@@ -99,8 +134,46 @@
         cell.textContent = num;
         cell.classList.add(`player${num}`);
       });
+      
+      // ルート描画関数を呼び出す
+      drawRoutes();
 
       updateScores();
+    }
+
+    // ルートを描画する関数
+    function drawRoutes() {
+      // 毎回キャンバスをクリア
+      ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+      if (!routes || routes.length === 0) return;
+
+      const cellWidth = 24 + 1; // セルのサイズ(24px) + ギャップ(1px)
+      
+      routes.forEach((route, playerIdx) => {
+        if (!route || route.length === 0) return;
+
+        const playerPos = players[playerIdx];
+
+        ctx.beginPath();
+        ctx.strokeStyle = playerColors[playerIdx];
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.7; // 少し半透明にする
+
+        // プレイヤーの現在地からパスを開始
+        const startX = playerPos[1] * cellWidth + cellWidth / 2;
+        const startY = playerPos[0] * cellWidth + cellWidth / 2;
+        ctx.moveTo(startX, startY);
+
+        // ルート上の星を順番に線で結ぶ
+        route.forEach(starPos => {
+          const targetX = starPos[1] * cellWidth + cellWidth / 2;
+          const targetY = starPos[0] * cellWidth + cellWidth / 2;
+          ctx.lineTo(targetX, targetY);
+        });
+        
+        ctx.stroke();
+      });
+      ctx.globalAlpha = 1.0; // 透明度を元に戻す
     }
 
     function updateScores() {
@@ -122,16 +195,18 @@
         const resp = await fetch('move', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ game_id: gameId, players: players, stars: stars, loop: loop })
+          body: JSON.stringify({ game_id: gameId, players: players }) // players情報のみ送信
         });
         const data = await resp.json();
         if (data.error) throw new Error(data.error);
+
+        // サーバーからのデータで全てを更新する
         players = data.coord;
         scores  = data.scores;
+        stars   = data.stars;   // サーバーから最新の星リストを受け取る
+        routes  = data.routes;  // サーバーから最新のルートリストを受け取る
         loop++;
-
-        // Remove collected stars (server already scored)
-        stars = stars.filter(([lr, lc]) => !players.some(([pr, pc]) => pr === lr && pc === lc));
+        
         draw();
 
         if (stars.length === 0) {
@@ -151,6 +226,6 @@
         .filter(i => i !== null);
       alert(`Winner(s): Player ${winners.join(', ')} with ${maxScore} star(s)!`);
     }
-  </script>
+</script>
 </body>
 </html>

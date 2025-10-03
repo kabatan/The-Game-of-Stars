@@ -7,13 +7,13 @@ from collections import defaultdict
 from typing import List, Tuple, Dict, Any
 import multiprocessing as mp
 import sys
+from var import TIMEOUT
 
 # --- Game configuration ---
 DEFAULT_NB_PLAYERS = 6
 ROWS, COLS = 20, 30
 STAR_COUNT = 50
 MAX_TURNS = 200  # ゲーム終了条件
-TIMEOUT = 1.0  # AI関数のタイムアウト（短縮）
 
 class GameSimulator:
     def __init__(self):

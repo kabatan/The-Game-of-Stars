@@ -4,7 +4,8 @@
 
 import math, random, time
 
-ROWS, COLS = 20, 30
+from var import TIMEOUT, STAR_COUNT,DEFAULT_NB_PLAYERS,ROWS,COLS
+
 MY_IDX = 4  # player5 (0-indexed)
 
 # -------- Hyperparameters --------
@@ -12,7 +13,7 @@ LOOKAHEAD = 4     # 短期読みの手数（敵の到達がこの手数以内な
 GAMMA     = 0.97  # 時間割引（早く取るほど価値↑）
 ALPHA     = 1.2   # 長期ロジスティックの鋭さ
 TOP_M     = 10    # SAで最適化する候補星の数
-SA_TIME   = 0.35  # SA探索時間（秒）
+SA_TIME   = TIMEOUT * 0.8  # SA探索時間（秒）
 T0, TMIN, COOL = 2.0, 0.05, 0.996  # 焼きなまし温度スケジュール
 
 # ------------- Utils -------------
