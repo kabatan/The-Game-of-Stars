@@ -61,9 +61,25 @@ def kmeans(star_list, K):
     return [clusters, global_maxdist, clustercenter]
             
 
+def closest_star(playerpos, expected_stars):
+    mindist=1000
+    mini=-1
+    for i in range(len(expected_stars)):
+        dis=rectdist(playerpos,expected_stars[i])
+        if dis<mindis:
+            mindis=dis
+            mini=i
+    return mini
 
-
-
+def cost(startpos, expected_stars):
+    distsum=0
+    expected_stars.remove(startpos)
+    for i in range(len(expected_stars)):
+        nextstar=closest_star(playerpos,expected_stars)
+        distsum+=rectdist(playerpos,expected_stars)
+        playerpos=expected_star[nextstar]
+        del expected_star[nextstar]
+    return distsum
 
 
 
