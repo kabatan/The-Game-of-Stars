@@ -3,7 +3,7 @@ from kmeanslib import kmeans
 
 def make_graph(star_list):
     KRASTERS_NUM = 5
-    MAX_KRASTER_DIST = 10
+    MAX_KRASTER_DIST = 5
     krasters, maxdist, kraster_centers = kmeans(star_list, KRASTERS_NUM, MAX_KRASTER_DIST)
     while maxdist > MAX_KRASTER_DIST:
         KRASTERS_NUM += 1

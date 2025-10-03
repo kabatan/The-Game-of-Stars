@@ -5,6 +5,7 @@ import pickle
 import os      
 
 from var import TIMEOUT, STAR_COUNT,DEFAULT_NB_PLAYERS,ROWS,COLS
+from make_graph import make_graph
 
 PLAYER_ID = 1
 ALPHA = 1.0
@@ -19,7 +20,9 @@ SIMULATETIMES = 10
 
 bot_state = {
     "star_list": [],
-    "star_graph": [],
+    "kraster_graph": [],
+    "each_kraster_graph": [],
+    "krasters": [],
     "pheromone": [],
     "valid_stars": []
 }
@@ -35,6 +38,35 @@ def load_state():
         bot_state = pickle.load(f)
 '''
 
+
+def closest_player(players):
+    global bot_state
+    closest = [[]]*len(bot_state["star_list"])
+    for s_idx in range(len(bot_state["star_list"])):
+        if (not bot_state["valid_stars"][s_idx]): continue
+        min_d = 1000
+        min_player_count = 0
+        for p_idx in range(len(players)):
+            r1,c1 = players[p_idx]
+            r2,c2 = bot_state["star_list"][s_idx]
+            d = abs(r1-r2)+abs(c1-c2)
+            if (d == min_d):
+                closest[s_idx].append(p_idx)
+            if (d < min_d):
+                min_d = d
+                closest[s_idx] = [p_idx]
+    return closest
+
+def kraster_reward(players):
+    global bot_state
+    rewards = [[0 for _ in range(len(bot_state["krasters"]))] for _ in range(len(players))]
+    closest = closest_player(players)
+    for k_idx in range(len(bot_state["krasters"])):
+        for s_idx in bot_state["krasters"][k_idx]:
+            if (not bot_state["valid_stars"][s_idx]): continue
+            for p_idx in closest[s_idx]:
+                rewards[p_idx][k_idx] += 1.0/len(closest[s_idx])
+    return rewards
 
 def choose_v(player_idx, v, rest_stars):
     global bot_state
