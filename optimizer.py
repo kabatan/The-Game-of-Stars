@@ -6,7 +6,7 @@ import multiprocessing as mp
 
 # --- 最適化の設定 ---
 PLAYER_ID = 2  # 最適化対象のプレイヤー番号
-N_GAMES_PER_TRIAL = 500  # 1回の評価で使用するゲーム数
+N_GAMES_PER_TRIAL = 10  # 1回の評価で使用するゲーム数
 STUDY_NAME = "p2_aco_optimization" # Optunaの学習履歴の名前
 STORAGE_URL = "sqlite:///p2_optimization.db" # 学習履歴を保存するデータベースファイル
 
@@ -15,14 +15,15 @@ def objective(trial: optuna.trial.Trial) -> float:
     """Optunaの目的関数。指定されたパラメータで勝率を計算し、返す"""
     
     params = {
-        "alpha": trial.suggest_float("alpha", 0.5, 3.0),
-        "beta_": trial.suggest_float("beta_", 1.0, 5.0),
+        "alpha": trial.suggest_float("alpha", 0.2, 3.0),
+        "beta_": trial.suggest_float("beta_", 1.0, 10.0),
         "gamma_": trial.suggest_float("gamma_", 0.5, 3.0),
         "rho": trial.suggest_float("rho", 0.8, 0.99),
         "q": trial.suggest_float("q", 0.5, 2.0),
-        "simu_num": trial.suggest_int("simu_num", 5, 20),
+        "simu_num": trial.suggest_int("simu_num", 5, 50),
         "best_bonus": trial.suggest_float("best_bonus", 1.0, 5.0),
         "win_bonus": trial.suggest_float("win_bonus", 1.0, 5.0),
+        "best_rho": trial.suggest_float("best_rho", 0.0, 1.0),
     }
 
     print(f"Trial {trial.number}: Testing params: {params}")

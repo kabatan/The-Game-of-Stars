@@ -437,6 +437,7 @@ void set_parameters(const pybind11::dict& params) {
     if (params.contains("simu_num")) simu_num = params["simu_num"].cast<u_int16_t>();
     if (params.contains("best_bonus")) best_bonus = params["best_bonus"].cast<float>();
     if (params.contains("win_bonus")) win_bonus = params["win_bonus"].cast<float>();
+    if (params.contains("best_rho")) best_rho = params["best_rho"].cast<float>();
 }
 
 PYBIND11_MODULE(move_ver1, m) {
