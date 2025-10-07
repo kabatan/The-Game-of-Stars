@@ -1,0 +1,4 @@
+/home/kabatan/The-Game-of-Stars/build/CMakeFiles/move_ver1.dir
+/home/kabatan/The-Game-of-Stars/build/CMakeFiles/move_ver2.dir
+/home/kabatan/The-Game-of-Stars/build/CMakeFiles/edit_cache.dir
+/home/kabatan/The-Game-of-Stars/build/CMakeFiles/rebuild_cache.dir

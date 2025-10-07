@@ -1,0 +1,254 @@
+import random
+import importlib
+import concurrent.futures
+import numpy as np
+import time
+from collections import defaultdict
+from typing import List, Tuple, Dict, Any
+import multiprocessing as mp
+import sys
+from var import TIMEOUT
+
+# --- Game configuration ---
+DEFAULT_NB_PLAYERS = 6
+ROWS, COLS = 20, 30
+STAR_COUNT = 50
+MAX_TURNS = 200  # ゲーム終了条件
+
+class GameSimulator:
+    def __init__(self):
+        self.move_functions = self._load_move_functions()
+    
+    def _load_move_functions(self):
+        """プレイヤーのmove関数を読み込み (reload each time to reset globals)"""
+        move_functions = []
+        for i in range(1, DEFAULT_NB_PLAYERS + 1):
+            module_name = f"player{i}"
+            try:
+                if module_name in sys.modules:
+                    # force reload if already imported
+                    mod = importlib.reload(sys.modules[module_name])
+                else:
+                    mod = importlib.import_module(module_name)
+                fn = getattr(mod, f"move{i}")
+                move_functions.append(fn)
+            except Exception:
+                def stay(players, stars, idx=i-1):
+                    return players[idx]
+                move_functions.append(stay)
+        return move_functions
+    
+    def generate_initial_positions(self, nb_players: int):
+        """初期位置とスター配置を生成"""
+        players = []
+        while len(players) < nb_players:
+            r, c = random.randint(0, ROWS - 1), random.randint(0, COLS - 1)
+            if all(abs(r - pr) + abs(c - pc) >= 5 for pr, pc in players):
+                players.append((r, c))
+
+        stars = []
+        while len(stars) < STAR_COUNT:
+            r, c = random.randint(0, ROWS - 1), random.randint(0, COLS - 1)
+            if (r, c) not in stars and all(abs(r - pr) + abs(c - pc) > 4 for pr, pc in players):
+                stars.append((r, c))
+        
+        return players, stars
+    
+    def simulate_turn(self, players: List[Tuple[int, int]], stars: List[Tuple[int, int]], 
+                     scores: List[int]) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]], List[int]]:
+        """1ターンをシミュレート"""
+        proposed = []
+        for idx, fn in enumerate(self.move_functions):
+            try:
+                new_coord = fn(players, stars)
+            except Exception:
+                new_coord = players[idx]
+            
+            # 移動の妥当性チェック
+            r0, c0 = players[idx]
+            r1, c1 = new_coord if isinstance(new_coord, (list, tuple)) and len(new_coord) == 2 else (r0, c0)
+            if abs(r1 - r0) + abs(c1 - c0) <= 1 and 0 <= r1 < ROWS and 0 <= c1 < COLS:
+                proposed.append((r1, c1))
+            else:
+                proposed.append((r0, c0))
+        
+        old_positions = players[:]
+        
+        # 同じターゲットへの衝突解決
+        target_to_indices = defaultdict(list)
+        for i, tgt in enumerate(proposed):
+            target_to_indices[tgt].append(i)
+        
+        winners = set()
+        for tgt, idxs in target_to_indices.items():
+            if len(idxs) == 1:
+                winners.add(idxs[0])
+            else:
+                winners.add(random.choice(idxs))
+        
+        # 占有ルールの適用
+        will_move = [(i in winners) and (proposed[i] != old_positions[i]) for i in range(len(proposed))]
+        vacating = {old_positions[i]: will_move[i] for i in range(len(old_positions))}
+        
+        final_positions = list(old_positions)
+        for i in range(len(proposed)):
+            if not will_move[i]:
+                continue
+            target = proposed[i]
+            if target in vacating and not vacating[target]:
+                continue
+            final_positions[i] = target
+        
+        # スコア更新とスター削除
+        new_scores = scores[:]
+        new_stars = []
+        star_set = set(stars)
+        collected_stars = set()
+        
+        for idx, pos in enumerate(final_positions):
+            if pos in star_set:
+                new_scores[idx] += 1
+                collected_stars.add(pos)
+        
+        new_stars = [star for star in stars if star not in collected_stars]
+        
+        return final_positions, new_stars, new_scores
+    
+    def simulate_game(self, game_id: int = 0) -> Dict[str, Any]:
+        """1ゲーム全体をシミュレート"""
+        # reload move functions fresh for each game
+        self.move_functions = self._load_move_functions()
+
+        players, stars = self.generate_initial_positions(DEFAULT_NB_PLAYERS)
+        scores = [0] * DEFAULT_NB_PLAYERS
+        turn = 0
+        
+        while turn < MAX_TURNS and len(stars) > 0:
+            players, stars, scores = self.simulate_turn(players, stars, scores)
+            turn += 1
+        
+        max_score = max(scores)
+        winners = [i for i, score in enumerate(scores) if score == max_score]
+        
+        return {
+            'game_id': game_id,
+            'scores': scores,
+            'turns': turn,
+            'winner': winners[0] if len(winners) == 1 else -1,
+            'is_tie': len(winners) > 1,
+            'max_score': max_score,
+            'total_stars_collected': sum(scores),
+            'remaining_stars': len(stars)
+        }
+
+def run_parallel_simulations(num_games: int, num_processes: int = None) -> List[Dict[str, Any]]:
+    if num_processes is None:
+        num_processes = min(mp.cpu_count(), 16)
+    
+    print(f"Running {num_games} simulations with {num_processes} processes...")
+    
+    with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as executor:
+        futures = [executor.submit(simulate_single_game, i) for i in range(num_games)]
+        results = []
+        
+        completed = 0
+        for future in concurrent.futures.as_completed(futures):
+            result = future.result()
+            results.append(result)
+            completed += 1
+            if completed % max(1, num_games // 10) == 0:
+                print(f"Progress: {completed}/{num_games} ({completed/num_games*100:.1f}%)")
+    
+    return results
+
+def simulate_single_game(game_id: int) -> Dict[str, Any]:
+    simulator = GameSimulator()
+    return simulator.simulate_game(game_id)
+
+def analyze_results(results: List[Dict[str, Any]]) -> None:
+    if not results:
+        print("No results to analyze.")
+        return
+    
+    print(f"\n=== Analysis of {len(results)} games ===")
+    
+    wins_by_player = defaultdict(int)
+    total_scores_by_player = defaultdict(list)
+    ties = 0
+    
+    for result in results:
+        if result['is_tie']:
+            ties += 1
+        else:
+            wins_by_player[result['winner']] += 1
+        
+        for i, score in enumerate(result['scores']):
+            total_scores_by_player[i].append(score)
+    
+    print("\n--- Win Rate Statistics ---")
+    for player in range(DEFAULT_NB_PLAYERS):
+        wins = wins_by_player[player]
+        win_rate = wins / len(results) * 100
+        print(f"Player {player + 1}: {wins:4d} wins ({win_rate:5.1f}%)")
+    
+    tie_rate = ties / len(results) * 100
+    print(f"Ties:        {ties:4d} games ({tie_rate:5.1f}%)")
+    
+    print("\n--- Score Statistics ---")
+    print("Player    | Avg Score | Min | Max | Std Dev")
+    print("----------|-----------|-----|-----|--------")
+    
+    for player in range(DEFAULT_NB_PLAYERS):
+        scores = total_scores_by_player[player]
+        avg_score = np.mean(scores)
+        min_score = np.min(scores)
+        max_score = np.max(scores)
+        std_score = np.std(scores)
+        print(f"Player {player + 1:2d} | {avg_score:9.2f} | {min_score:3d} | {max_score:3d} | {std_score:7.2f}")
+    
+    avg_turns = np.mean([r['turns'] for r in results])
+    avg_max_score = np.mean([r['max_score'] for r in results])
+    avg_total_collected = np.mean([r['total_stars_collected'] for r in results])
+    avg_remaining = np.mean([r['remaining_stars'] for r in results])
+    
+    print(f"\n--- Game Statistics ---")
+    print(f"Average turns per game:     {avg_turns:.1f}")
+    print(f"Average winning score:      {avg_max_score:.1f}")
+    print(f"Average total stars taken:  {avg_total_collected:.1f}")
+    print(f"Average stars remaining:    {avg_remaining:.1f}")
+
+def main():
+    print("Game Statistics Analyzer")
+    print("=" * 50)
+    
+    try:
+        num_games = int(input("Number of games to simulate (default: 1000): ") or "1000")
+        num_processes = input(f"Number of processes (default: auto, max {mp.cpu_count()}): ") or None
+        if num_processes:
+            num_processes = int(num_processes)
+    except ValueError:
+        print("Invalid input. Using defaults.")
+        num_games = 1000
+        num_processes = None
+    
+    start_time = time.time()
+    
+    try:
+        results = run_parallel_simulations(num_games, num_processes)
+        
+        end_time = time.time()
+        duration = end_time - start_time
+        games_per_second = num_games / duration if duration > 0 else 0
+        
+        print(f"\nSimulation completed in {duration:.2f} seconds")
+        print(f"Rate: {games_per_second:.1f} games/second")
+        
+        analyze_results(results)
+    
+    except KeyboardInterrupt:
+        print("\nSimulation interrupted by user.")
+    except Exception as e:
+        print(f"Error during simulation: {e}")
+
+if __name__ == "__main__":
+    main()

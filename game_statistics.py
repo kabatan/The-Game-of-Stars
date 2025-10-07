@@ -7,7 +7,8 @@ from collections import defaultdict
 from typing import List, Tuple, Dict, Any
 import multiprocessing as mp
 import sys
-from var import TIMEOUT
+import argparse
+import json
 
 # --- Game configuration ---
 DEFAULT_NB_PLAYERS = 6
@@ -55,8 +56,10 @@ class GameSimulator:
         return players, stars
     
     def simulate_turn(self, players: List[Tuple[int, int]], stars: List[Tuple[int, int]], 
-                     scores: List[int]) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]], List[int]]:
+                      scores: List[int]) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]], List[int]]:
         """1ターンをシミュレート"""
+        players_before_turn = list(players)
+        
         proposed = []
         for idx, fn in enumerate(self.move_functions):
             try:
@@ -101,7 +104,6 @@ class GameSimulator:
         
         # スコア更新とスター削除
         new_scores = scores[:]
-        new_stars = []
         star_set = set(stars)
         collected_stars = set()
         
@@ -111,12 +113,23 @@ class GameSimulator:
                 collected_stars.add(pos)
         
         new_stars = [star for star in stars if star not in collected_stars]
+
+        # --- デバッグ用出力（標準エラー出力へ） ---
+        player2_before = players_before_turn[1]
+        player2_after = final_positions[1]
+        score2_before = scores[1]
+        score2_after = new_scores[1]
+
+        if player2_before != player2_after:
+            print(f"[DEBUG] Player 2 moved: {player2_before} -> {player2_after}", file=sys.stderr)
+        if score2_before != score2_after:
+            print(f"[DEBUG] Player 2 scored! Score: {score2_before} -> {score2_after}", file=sys.stderr)
+        # --- デバッグここまで ---
         
         return final_positions, new_stars, new_scores
     
     def simulate_game(self, game_id: int = 0) -> Dict[str, Any]:
         """1ゲーム全体をシミュレート"""
-        # reload move functions fresh for each game
         self.move_functions = self._load_move_functions()
 
         players, stars = self.generate_initial_positions(DEFAULT_NB_PLAYERS)
@@ -127,7 +140,7 @@ class GameSimulator:
             players, stars, scores = self.simulate_turn(players, stars, scores)
             turn += 1
         
-        max_score = max(scores)
+        max_score = max(scores) if scores else 0
         winners = [i for i, score in enumerate(scores) if score == max_score]
         
         return {
@@ -145,7 +158,10 @@ def run_parallel_simulations(num_games: int, num_processes: int = None) -> List[
     if num_processes is None:
         num_processes = min(mp.cpu_count(), 16)
     
-    print(f"Running {num_games} simulations with {num_processes} processes...")
+    # JSON出力モードでない場合のみ、進捗状況を表示
+    is_json_output = "--json-output" in sys.argv
+    if not is_json_output:
+        print(f"Running {num_games} simulations with {num_processes} processes...")
     
     with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as executor:
         futures = [executor.submit(simulate_single_game, i) for i in range(num_games)]
@@ -153,11 +169,15 @@ def run_parallel_simulations(num_games: int, num_processes: int = None) -> List[
         
         completed = 0
         for future in concurrent.futures.as_completed(futures):
-            result = future.result()
-            results.append(result)
+            try:
+                result = future.result()
+                results.append(result)
+            except Exception as e:
+                print(f"A simulation task failed: {e}", file=sys.stderr)
+
             completed += 1
-            if completed % max(1, num_games // 10) == 0:
-                print(f"Progress: {completed}/{num_games} ({completed/num_games*100:.1f}%)")
+            if not is_json_output and completed % max(1, num_games // 10) == 0:
+                print(f"Progress: {completed}/{num_games} ({completed/num_games*100:.1f}%)", file=sys.stderr)
     
     return results
 
@@ -165,12 +185,10 @@ def simulate_single_game(game_id: int) -> Dict[str, Any]:
     simulator = GameSimulator()
     return simulator.simulate_game(game_id)
 
-def analyze_results(results: List[Dict[str, Any]]) -> None:
+def analyze_results(results: List[Dict[str, Any]], json_output: bool = False) -> Dict[str, Any]:
     if not results:
-        print("No results to analyze.")
-        return
-    
-    print(f"\n=== Analysis of {len(results)} games ===")
+        print("No results to analyze.", file=sys.stderr)
+        return {}
     
     wins_by_player = defaultdict(int)
     total_scores_by_player = defaultdict(list)
@@ -184,71 +202,80 @@ def analyze_results(results: List[Dict[str, Any]]) -> None:
         
         for i, score in enumerate(result['scores']):
             total_scores_by_player[i].append(score)
-    
-    print("\n--- Win Rate Statistics ---")
+
+    # --- JSON出力用のデータを作成 ---
+    output_data = {
+        "num_games": len(results),
+        "win_rates": {},
+        "avg_scores": {},
+        "ties": {
+            "count": ties,
+            "rate": ties / len(results) * 100 if results else 0
+        }
+    }
     for player in range(DEFAULT_NB_PLAYERS):
         wins = wins_by_player[player]
-        win_rate = wins / len(results) * 100
-        print(f"Player {player + 1}: {wins:4d} wins ({win_rate:5.1f}%)")
-    
-    tie_rate = ties / len(results) * 100
-    print(f"Ties:        {ties:4d} games ({tie_rate:5.1f}%)")
-    
-    print("\n--- Score Statistics ---")
-    print("Player    | Avg Score | Min | Max | Std Dev")
-    print("----------|-----------|-----|-----|--------")
-    
-    for player in range(DEFAULT_NB_PLAYERS):
+        win_rate = wins / len(results) * 100 if results else 0
         scores = total_scores_by_player[player]
-        avg_score = np.mean(scores)
-        min_score = np.min(scores)
-        max_score = np.max(scores)
-        std_score = np.std(scores)
-        print(f"Player {player + 1:2d} | {avg_score:9.2f} | {min_score:3d} | {max_score:3d} | {std_score:7.2f}")
+        avg_score = np.mean(scores) if scores else 0
+        
+        output_data["win_rates"][f"player_{player + 1}"] = win_rate
+        output_data["avg_scores"][f"player_{player + 1}"] = avg_score
     
-    avg_turns = np.mean([r['turns'] for r in results])
-    avg_max_score = np.mean([r['max_score'] for r in results])
-    avg_total_collected = np.mean([r['total_stars_collected'] for r in results])
-    avg_remaining = np.mean([r['remaining_stars'] for r in results])
-    
-    print(f"\n--- Game Statistics ---")
-    print(f"Average turns per game:     {avg_turns:.1f}")
-    print(f"Average winning score:      {avg_max_score:.1f}")
-    print(f"Average total stars taken:  {avg_total_collected:.1f}")
-    print(f"Average stars remaining:    {avg_remaining:.1f}")
+    if json_output:
+        # JSONフラグがTrueなら、結果をJSON形式で標準出力に出力
+        print(json.dumps(output_data))
+    else:
+        # 従来通りのコンソール表示
+        print(f"\n=== Analysis of {len(results)} games ===")
+        print("\n--- Win Rate Statistics ---")
+        for player in range(DEFAULT_NB_PLAYERS):
+            print(f"Player {player + 1}: {wins_by_player[player]:4d} wins ({output_data['win_rates'][f'player_{player + 1}']:5.1f}%)")
+        print(f"Ties:         {ties:4d} games ({output_data['ties']['rate']:5.1f}%)")
+        # ... (他の統計情報の表示もここに追加可能) ...
+
+    return output_data
 
 def main():
-    print("Game Statistics Analyzer")
-    print("=" * 50)
-    
-    try:
-        num_games = int(input("Number of games to simulate (default: 1000): ") or "1000")
-        num_processes = input(f"Number of processes (default: auto, max {mp.cpu_count()}): ") or None
-        if num_processes:
-            num_processes = int(num_processes)
-    except ValueError:
-        print("Invalid input. Using defaults.")
-        num_games = 1000
-        num_processes = None
-    
+    # --- コマンドライン引数のパーサーを設定 ---
+    parser = argparse.ArgumentParser(description="Game Statistics Analyzer")
+    parser.add_argument(
+        "-n", "--num-games", type=int, default=1000,
+        help="Number of games to simulate"
+    )
+    parser.add_argument(
+        "-p", "--num-processes", type=int, default=None,
+        help=f"Number of processes to use (default: auto, max {mp.cpu_count()})"
+    )
+    parser.add_argument(
+        "--json-output", action="store_true",
+        help="Output analysis results in JSON format to stdout"
+    )
+    args = parser.parse_args()
+
+    if not args.json_output:
+        print("Game Statistics Analyzer")
+        print("=" * 50)
+
     start_time = time.time()
     
     try:
-        results = run_parallel_simulations(num_games, num_processes)
+        results = run_parallel_simulations(args.num_games, args.num_processes)
         
         end_time = time.time()
         duration = end_time - start_time
-        games_per_second = num_games / duration if duration > 0 else 0
         
-        print(f"\nSimulation completed in {duration:.2f} seconds")
-        print(f"Rate: {games_per_second:.1f} games/second")
-        
-        analyze_results(results)
+        if not args.json_output:
+            games_per_second = args.num_games / duration if duration > 0 else 0
+            print(f"\nSimulation completed in {duration:.2f} seconds")
+            print(f"Rate: {games_per_second:.1f} games/second")
+            
+        analyze_results(results, json_output=args.json_output)
     
     except KeyboardInterrupt:
-        print("\nSimulation interrupted by user.")
+        print("\nSimulation interrupted by user.", file=sys.stderr)
     except Exception as e:
-        print(f"Error during simulation: {e}")
+        print(f"Error during simulation: {e}", file=sys.stderr)
 
 if __name__ == "__main__":
     main()

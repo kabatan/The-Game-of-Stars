@@ -2,7 +2,7 @@ def move1(players, stars):
     """
     players: list of (r, c) current positions for all 6 players
     stars: list of (r, c) star positions
-    return: (r, c) new position for player 2 (max 1 orthogonal step or stay)
+    return: (r, c) new position for player 1 (max 1 orthogonal step or stay)
     """
 
     r, c = players[0]

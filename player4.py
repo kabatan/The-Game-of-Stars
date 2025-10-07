@@ -13,8 +13,8 @@ BETA = 2.0
 GAMMA = 1.0
 RHO = 0.05
 Q = 1.0
-SIMULATETIMES = 10
-GLOBALBESTBONUS = 2.0
+SIMULATETIMES = 50
+GLOBALBESTBONUS = 5
 
 ''' STATE_FILE = f'player_{PLAYER_ID}_state.pkl' '''
 
@@ -153,14 +153,18 @@ def simulate_greedy(ants):
 
     return scores, player_route
 
-def simulate_global_best(ants):
+def simulate_with_global_best(ants, player_idx, suggested_routes):
     global bot_state
     scores = [0]*len(ants)
     rest_stars = bot_state["valid_stars"][:]
-    player_routes = [bot_state["global_best_route"][i][:] for i in range(len(ants))]
+    player_routes = [[] for i in range(len(ants))]
     game_q = []
     for ant_idx in range(len(ants)):
         heapq.heappush(game_q, (0, ant_idx, ant_idx+STAR_COUNT))
+        if (player_idx == ant_idx and suggested_routes):
+            player_routes[ant_idx] = suggested_routes[:]
+        elif bot_state["global_best_route"][ant_idx]:
+            player_routes[ant_idx] = bot_state["global_best_route"][ant_idx][:]
 
     while game_q:
         current = game_q[0][0]
@@ -237,7 +241,7 @@ def update_graph(players):
             bot_state["global_best_score"][i] -= 1
             bot_state["global_best_route"][i] = bot_state["global_best_route"][i][1:]
 
-    bot_state["global_best_score"] = simulate_global_best(players)
+    bot_state["global_best_score"] = simulate_with_global_best(players, 0, bot_state["global_best_route"][0])
     
 
 
@@ -290,6 +294,7 @@ def move4(players, stars):
         update_graph(players)
 
     end_time = time.perf_counter() + TIMEOUT*0.8
+    t=0
     
     while time.perf_counter() < end_time:
         good_score = [0]*len(players)
@@ -300,24 +305,35 @@ def move4(players, stars):
                 if (scores[i] > good_score[i]):
                     good_score[i] = scores[i]
                     good_route[i] = player_route[i]
+            t += 1
 
 
         for i in range(len(players)):
-            I = 1.0
 
-            if (good_score[i] > bot_state["global_best_score"][i]):
-                ''' I = GLOBALBESTBONUS*(good_score[i]/(bot_state["global_best_score"][i]+0.01)) '''
-                bot_state["global_best_score"][i] = good_score[i]
+            test_score = simulate_with_global_best(players, i, good_route[i])
+
+            I = 1.0
+            is_best = False
+
+            if (test_score[i] > bot_state["global_best_score"][i]):
+                I = (test_score[i]/(bot_state["global_best_score"][i]+0.01))
+                bot_state["global_best_score"][i] = test_score[i]
                 bot_state["global_best_route"][i] = good_route[i]
+                is_best = True
             
 
-            if (good_score[i] > 0):
+            if (test_score[i] > 0):
                 route = good_route[i]
                 for j in range(1, len(route)):
                     v = route[j-1]
                     to = route[j]
-                    bot_state["pheromone"][i][v][to] += I * (good_score[i]**GAMMA)
-                    bot_state["pheromone"][i][to][v] += I * (good_score[i]**GAMMA)
+                    if (is_best):
+                        bot_state["pheromone"][i][v][to] += I * (test_score[i]**GAMMA) * (GLOBALBESTBONUS ** ((1.0-(j-1)/(2*len(route)))))
+                        bot_state["pheromone"][i][to][v] += I * (test_score[i]**GAMMA) * (GLOBALBESTBONUS ** ((1.0-(j-1)/(2*len(route)))))
+                    else:
+                        bot_state["pheromone"][i][v][to] += I * (test_score[i]**GAMMA)
+                        bot_state["pheromone"][i][to][v] += I * (test_score[i]**GAMMA)
+
 
 
         pheromone_check()
@@ -328,5 +344,6 @@ def move4(players, stars):
                 bot_state["pheromone"][i][j][k] *= (1.0 - RHO)
     
     '''save_state()'''
+    '''print(f"player{PLAYER_ID} simulate times: {t}")'''
 
     return move_to_star(players[PLAYER_ID], bot_state["star_list"][bot_state["global_best_route"][PLAYER_ID][0]]) if len(bot_state["global_best_route"][PLAYER_ID])>=1 else players[PLAYER_ID]

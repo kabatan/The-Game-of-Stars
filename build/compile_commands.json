@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/kabatan/The-Game-of-Stars/build",
+  "command": "/usr/bin/g++ -Dmove_ver1_EXPORTS -isystem /usr/include/python3.12 -isystem /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include -g -fPIC -fvisibility=hidden -o CMakeFiles/move_ver1.dir/move_ver1.cpp.o -c /home/kabatan/The-Game-of-Stars/move_ver1.cpp",
+  "file": "/home/kabatan/The-Game-of-Stars/move_ver1.cpp",
+  "output": "CMakeFiles/move_ver1.dir/move_ver1.cpp.o"
+},
+{
+  "directory": "/home/kabatan/The-Game-of-Stars/build",
+  "command": "/usr/bin/g++ -Dmove_ver2_EXPORTS -isystem /usr/include/python3.12 -isystem /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include -g -fPIC -fvisibility=hidden -o CMakeFiles/move_ver2.dir/move_ver2.cpp.o -c /home/kabatan/The-Game-of-Stars/move_ver2.cpp",
+  "file": "/home/kabatan/The-Game-of-Stars/move_ver2.cpp",
+  "output": "CMakeFiles/move_ver2.dir/move_ver2.cpp.o"
+}
+]

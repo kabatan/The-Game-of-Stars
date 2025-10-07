@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC -g -shared  -o /home/kabatan/The-Game-of-Stars/move_ver1.cpython-312-x86_64-linux-gnu.so CMakeFiles/move_ver1.dir/move_ver1.cpp.o 
