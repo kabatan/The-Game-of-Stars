@@ -15,15 +15,15 @@ constexpr float time_out = 0.1;
 constexpr u_int16_t s_num = 50;
 constexpr u_int16_t p_num = 6;
 
-float alpha = 1.0;
-float beta_ = 2.0;
-float gamma_ = 1.0;
-float rho = 0.95;
-float q = 1.0;
-u_int16_t simu_num = 10;
-float best_bonus = 2.0;
-float win_bonus = 3.0;
-float best_rho = 0.0;
+float alpha = 0.569482190990515;
+float beta_ = 4.489979725257659;
+float gamma_ = 0.7079186445298555;
+float rho = 0.9686382906336246;
+float q = 1.1460541007948608;
+u_int16_t simu_num = 19;
+float best_bonus = 2.7086322894327672;
+float win_bonus = 2.7086322894327672;
+float best_rho = 0.3;
 
 struct point {
     int r,c;
