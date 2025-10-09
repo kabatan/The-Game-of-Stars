@@ -6,5 +6,5 @@ CXX_DEFINES = -Dmove_ver2_EXPORTS
 
 CXX_INCLUDES = -isystem /usr/include/python3.12 -isystem /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include
 
-CXX_FLAGS = -g -fPIC -fvisibility=hidden
+CXX_FLAGS = -g -fPIC -fvisibility=hidden -fopenmp
 

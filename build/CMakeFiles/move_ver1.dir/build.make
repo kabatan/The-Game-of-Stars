@@ -92,6 +92,8 @@ move_ver1_EXTERNAL_OBJECTS =
 
 /home/kabatan/The-Game-of-Stars/move_ver1.cpython-312-x86_64-linux-gnu.so: CMakeFiles/move_ver1.dir/move_ver1.cpp.o
 /home/kabatan/The-Game-of-Stars/move_ver1.cpython-312-x86_64-linux-gnu.so: CMakeFiles/move_ver1.dir/build.make
+/home/kabatan/The-Game-of-Stars/move_ver1.cpython-312-x86_64-linux-gnu.so: /usr/lib/gcc/x86_64-linux-gnu/13/libgomp.so
+/home/kabatan/The-Game-of-Stars/move_ver1.cpython-312-x86_64-linux-gnu.so: /usr/lib/x86_64-linux-gnu/libpthread.a
 /home/kabatan/The-Game-of-Stars/move_ver1.cpython-312-x86_64-linux-gnu.so: CMakeFiles/move_ver1.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/kabatan/The-Game-of-Stars/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX shared module /home/kabatan/The-Game-of-Stars/move_ver1.cpython-312-x86_64-linux-gnu.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/move_ver1.dir/link.txt --verbose=$(VERBOSE)

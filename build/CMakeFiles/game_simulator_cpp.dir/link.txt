@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC -g -shared  -o /home/kabatan/The-Game-of-Stars/game_simulator_cpp.cpython-312-x86_64-linux-gnu.so CMakeFiles/game_simulator_cpp.dir/game_simulator.cpp.o 

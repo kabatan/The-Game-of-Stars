@@ -142,6 +142,43 @@ move_ver2/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/move_ver2.dir/build.make CMakeFiles/move_ver2.dir/build
 .PHONY : move_ver2/fast
 
+#=============================================================================
+# Target rules for targets named game_simulator_cpp
+
+# Build rule for target.
+game_simulator_cpp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 game_simulator_cpp
+.PHONY : game_simulator_cpp
+
+# fast build rule for target.
+game_simulator_cpp/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_simulator_cpp.dir/build.make CMakeFiles/game_simulator_cpp.dir/build
+.PHONY : game_simulator_cpp/fast
+
+game_simulator.o: game_simulator.cpp.o
+.PHONY : game_simulator.o
+
+# target to build an object file
+game_simulator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_simulator_cpp.dir/build.make CMakeFiles/game_simulator_cpp.dir/game_simulator.cpp.o
+.PHONY : game_simulator.cpp.o
+
+game_simulator.i: game_simulator.cpp.i
+.PHONY : game_simulator.i
+
+# target to preprocess a source file
+game_simulator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_simulator_cpp.dir/build.make CMakeFiles/game_simulator_cpp.dir/game_simulator.cpp.i
+.PHONY : game_simulator.cpp.i
+
+game_simulator.s: game_simulator.cpp.s
+.PHONY : game_simulator.s
+
+# target to generate assembly for a file
+game_simulator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_simulator_cpp.dir/build.make CMakeFiles/game_simulator_cpp.dir/game_simulator.cpp.s
+.PHONY : game_simulator.cpp.s
+
 move_ver1.o: move_ver1.cpp.o
 .PHONY : move_ver1.o
 
@@ -198,8 +235,12 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... game_simulator_cpp"
 	@echo "... move_ver1"
 	@echo "... move_ver2"
+	@echo "... game_simulator.o"
+	@echo "... game_simulator.i"
+	@echo "... game_simulator.s"
 	@echo "... move_ver1.o"
 	@echo "... move_ver1.i"
 	@echo "... move_ver1.s"

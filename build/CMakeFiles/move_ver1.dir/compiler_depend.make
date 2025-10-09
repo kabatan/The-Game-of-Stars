@@ -501,11 +501,14 @@ CMakeFiles/move_ver1.dir/move_ver1.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
   /usr/include/x86_64-linux-gnu/sys/time.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h \
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/omp.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h
 
+
+/usr/lib/gcc/x86_64-linux-gnu/13/include/omp.h:
 
 /usr/include/x86_64-linux-gnu/sys/time.h:
 

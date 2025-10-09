@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "/home/kabatan/The-Game-of-Stars/move_ver2.cpython-312-x86_64-linux-gnu.so"
+			"path" : "/home/kabatan/The-Game-of-Stars/game_simulator_cpp.cpython-312-x86_64-linux-gnu.so"
 		}
 	],
 	"backtrace" : 4,
@@ -31,7 +31,7 @@
 			{
 				"command" : 3,
 				"file" : 3,
-				"line" : 10,
+				"line" : 27,
 				"parent" : 0
 			},
 			{
@@ -78,7 +78,7 @@
 			"defines" : 
 			[
 				{
-					"define" : "move_ver2_EXPORTS"
+					"define" : "game_simulator_cpp_EXPORTS"
 				}
 			],
 			"includes" : 
@@ -101,7 +101,7 @@
 			]
 		}
 	],
-	"id" : "move_ver2::@6890427a1f51a3e7e1df",
+	"id" : "game_simulator_cpp::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -113,8 +113,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "move_ver2",
-	"nameOnDisk" : "move_ver2.cpython-312-x86_64-linux-gnu.so",
+	"name" : "game_simulator_cpp",
+	"nameOnDisk" : "game_simulator_cpp.cpython-312-x86_64-linux-gnu.so",
 	"paths" : 
 	{
 		"build" : ".",
@@ -135,7 +135,7 @@
 		{
 			"backtrace" : 4,
 			"compileGroupIndex" : 0,
-			"path" : "move_ver2.cpp",
+			"path" : "game_simulator.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

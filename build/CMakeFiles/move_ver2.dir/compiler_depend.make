@@ -60,6 +60,7 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
   /usr/include/c++/13/bits/char_traits.h \
   /usr/include/c++/13/bits/charconv.h \
   /usr/include/c++/13/bits/chrono.h \
+  /usr/include/c++/13/bits/codecvt.h \
   /usr/include/c++/13/bits/concept_check.h \
   /usr/include/c++/13/bits/cpp_type_traits.h \
   /usr/include/c++/13/bits/cxxabi_forced.h \
@@ -72,6 +73,7 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
   /usr/include/c++/13/bits/exception_ptr.h \
   /usr/include/c++/13/bits/forward_list.h \
   /usr/include/c++/13/bits/forward_list.tcc \
+  /usr/include/c++/13/bits/fstream.tcc \
   /usr/include/c++/13/bits/functexcept.h \
   /usr/include/c++/13/bits/functional_hash.h \
   /usr/include/c++/13/bits/gslice.h \
@@ -189,6 +191,7 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
   /usr/include/c++/13/ext/string_conversions.h \
   /usr/include/c++/13/ext/type_traits.h \
   /usr/include/c++/13/forward_list \
+  /usr/include/c++/13/fstream \
   /usr/include/c++/13/functional \
   /usr/include/c++/13/initializer_list \
   /usr/include/c++/13/ios \
@@ -479,8 +482,10 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
   /usr/include/x86_64-linux-gnu/bits/wordsize.h \
   /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
   /usr/include/x86_64-linux-gnu/c++/13/bits/atomic_word.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/basic_file.h \
   /usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h \
   /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h \
   /usr/include/x86_64-linux-gnu/c++/13/bits/c++locale.h \
   /usr/include/x86_64-linux-gnu/c++/13/bits/cpu_defines.h \
   /usr/include/x86_64-linux-gnu/c++/13/bits/ctype_base.h \
@@ -501,11 +506,14 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
   /usr/include/x86_64-linux-gnu/sys/time.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h \
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/omp.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h
 
+
+/usr/lib/gcc/x86_64-linux-gnu/13/include/omp.h:
 
 /usr/include/x86_64-linux-gnu/sys/time.h:
 
@@ -532,6 +540,8 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/basic_file.h:
 
 /usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
 
@@ -833,12 +843,6 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 
 /usr/include/linux/stddef.h:
 
-/usr/include/c++/13/debug/assertions.h:
-
-/usr/include/stdio.h:
-
-/usr/include/c++/13/bits/stl_iterator_base_types.h:
-
 /usr/include/c++/13/bits/functexcept.h:
 
 /usr/include/python3.12/sysmodule.h:
@@ -867,6 +871,10 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 
 /usr/include/c++/13/cwctype:
 
+/usr/include/linux/limits.h:
+
+/usr/include/c++/13/ratio:
+
 /usr/include/python3.12/cpython/pydebug.h:
 
 /usr/include/c++/13/bits/std_mutex.h:
@@ -874,10 +882,6 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 /usr/include/c++/13/bits/stl_construct.h:
 
 /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/pytypes.h:
-
-/usr/include/python3.12/ceval.h:
-
-/usr/include/c++/13/bits/random.h:
 
 /usr/include/c++/13/bits/std_abs.h:
 
@@ -890,10 +894,6 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 /usr/include/c++/13/bits/ostream.tcc:
 
 /usr/include/c++/13/bits/memoryfwd.h:
-
-/usr/include/c++/13/bits/stl_list.h:
-
-/usr/include/c++/13/bits/erase_if.h:
 
 /usr/include/c++/13/bits/basic_ios.tcc:
 
@@ -969,6 +969,10 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 
 /usr/include/c++/13/bits/cxxabi_forced.h:
 
+/usr/include/python3.12/ceval.h:
+
+/usr/include/c++/13/bits/random.h:
+
 /usr/include/c++/13/bits/stl_algo.h:
 
 /usr/include/c++/13/cstddef:
@@ -1033,6 +1037,8 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 
 /usr/include/c++/13/bits/locale_facets.tcc:
 
+/usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h:
+
 /usr/include/c++/13/typeinfo:
 
 /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/detail/struct_smart_holder.h:
@@ -1050,6 +1056,8 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 /usr/include/python3.12/osmodule.h:
 
 /usr/include/c++/13/cstdio:
+
+/usr/include/c++/13/fstream:
 
 /usr/include/python3.12/cpython/object.h:
 
@@ -1124,6 +1132,8 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 /usr/include/c++/13/backward/auto_ptr.h:
 
 /usr/include/assert.h:
+
+/usr/include/c++/13/bits/fstream.tcc:
 
 /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/cast.h:
 
@@ -1269,6 +1279,16 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 
 /usr/include/c++/13/bits/chrono.h:
 
+/usr/include/stdio.h:
+
+/usr/include/c++/13/bits/stl_iterator_base_types.h:
+
+/usr/include/c++/13/bits/erase_if.h:
+
+/usr/include/c++/13/bits/stl_list.h:
+
+/usr/include/c++/13/debug/assertions.h:
+
 /usr/include/c++/13/bits/stl_map.h:
 
 /usr/include/python3.12/unicodeobject.h:
@@ -1310,6 +1330,8 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 /usr/include/c++/13/bits/valarray_before.h:
 
 /usr/include/c++/13/bits/stl_tempbuf.h:
+
+/usr/include/c++/13/bits/codecvt.h:
 
 /usr/include/c++/13/bits/stl_tree.h:
 
@@ -1395,6 +1417,10 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 
 /usr/include/c++/13/cxxabi.h:
 
+/usr/include/linux/errno.h:
+
+/usr/include/c++/13/debug/debug.h:
+
 /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/detail/class.h:
 
 /usr/include/c++/13/ext/aligned_buffer.h:
@@ -1459,10 +1485,6 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 
 /usr/include/c++/13/queue:
 
-/usr/include/c++/13/ratio:
-
-/usr/include/linux/limits.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h:
 
 /usr/include/c++/13/sstream:
@@ -1510,7 +1532,3 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: /home/kabatan/The-Game-of-Stars/move_v
 /usr/include/c++/13/version:
 
 /usr/include/ctype.h:
-
-/usr/include/c++/13/debug/debug.h:
-
-/usr/include/linux/errno.h:

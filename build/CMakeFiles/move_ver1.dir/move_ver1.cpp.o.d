@@ -1,5 +1,6 @@
 CMakeFiles/move_ver1.dir/move_ver1.cpp.o: \
  /home/kabatan/The-Game-of-Stars/move_ver1.cpp /usr/include/stdc-predef.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/omp.h \
  /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/pybind11.h \
  /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/detail/class.h \
  /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/attr.h \

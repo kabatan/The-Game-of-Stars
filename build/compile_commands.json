@@ -1,14 +1,20 @@
 [
 {
   "directory": "/home/kabatan/The-Game-of-Stars/build",
-  "command": "/usr/bin/g++ -Dmove_ver1_EXPORTS -isystem /usr/include/python3.12 -isystem /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include -g -fPIC -fvisibility=hidden -o CMakeFiles/move_ver1.dir/move_ver1.cpp.o -c /home/kabatan/The-Game-of-Stars/move_ver1.cpp",
+  "command": "/usr/bin/g++ -Dmove_ver1_EXPORTS -isystem /usr/include/python3.12 -isystem /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include -g -fPIC -fvisibility=hidden -fopenmp -o CMakeFiles/move_ver1.dir/move_ver1.cpp.o -c /home/kabatan/The-Game-of-Stars/move_ver1.cpp",
   "file": "/home/kabatan/The-Game-of-Stars/move_ver1.cpp",
   "output": "CMakeFiles/move_ver1.dir/move_ver1.cpp.o"
 },
 {
   "directory": "/home/kabatan/The-Game-of-Stars/build",
-  "command": "/usr/bin/g++ -Dmove_ver2_EXPORTS -isystem /usr/include/python3.12 -isystem /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include -g -fPIC -fvisibility=hidden -o CMakeFiles/move_ver2.dir/move_ver2.cpp.o -c /home/kabatan/The-Game-of-Stars/move_ver2.cpp",
+  "command": "/usr/bin/g++ -Dmove_ver2_EXPORTS -isystem /usr/include/python3.12 -isystem /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include -g -fPIC -fvisibility=hidden -fopenmp -o CMakeFiles/move_ver2.dir/move_ver2.cpp.o -c /home/kabatan/The-Game-of-Stars/move_ver2.cpp",
   "file": "/home/kabatan/The-Game-of-Stars/move_ver2.cpp",
   "output": "CMakeFiles/move_ver2.dir/move_ver2.cpp.o"
+},
+{
+  "directory": "/home/kabatan/The-Game-of-Stars/build",
+  "command": "/usr/bin/g++ -Dgame_simulator_cpp_EXPORTS -isystem /usr/include/python3.12 -isystem /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include -g -fPIC -fvisibility=hidden -o CMakeFiles/game_simulator_cpp.dir/game_simulator.cpp.o -c /home/kabatan/The-Game-of-Stars/game_simulator.cpp",
+  "file": "/home/kabatan/The-Game-of-Stars/game_simulator.cpp",
+  "output": "CMakeFiles/game_simulator_cpp.dir/game_simulator.cpp.o"
 }
 ]

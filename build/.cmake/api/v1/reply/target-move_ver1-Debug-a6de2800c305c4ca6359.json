@@ -14,6 +14,8 @@
 			"__Python_add_library",
 			"python_add_library",
 			"pybind11_add_module",
+			"set_property",
+			"find_package",
 			"target_link_libraries"
 		],
 		"files" : 
@@ -21,7 +23,8 @@
 			"/usr/share/cmake-3.28/Modules/FindPython/Support.cmake",
 			"/usr/share/cmake-3.28/Modules/FindPython.cmake",
 			".venv/lib/python3.12/site-packages/pybind11/share/cmake/pybind11/pybind11NewTools.cmake",
-			"CMakeLists.txt"
+			"CMakeLists.txt",
+			"/usr/share/cmake-3.28/Modules/FindOpenMP.cmake"
 		],
 		"nodes" : 
 		[
@@ -31,7 +34,7 @@
 			{
 				"command" : 3,
 				"file" : 3,
-				"line" : 7,
+				"line" : 13,
 				"parent" : 0
 			},
 			{
@@ -53,13 +56,35 @@
 				"parent" : 3
 			},
 			{
+				"command" : 5,
+				"file" : 3,
+				"line" : 9,
+				"parent" : 0
+			},
+			{
+				"file" : 4,
+				"parent" : 5
+			},
+			{
 				"command" : 4,
+				"file" : 4,
+				"line" : 619,
+				"parent" : 6
+			},
+			{
+				"command" : 6,
+				"file" : 3,
+				"line" : 16,
+				"parent" : 0
+			},
+			{
+				"command" : 6,
 				"file" : 0,
 				"line" : 4082,
 				"parent" : 3
 			},
 			{
-				"command" : 4,
+				"command" : 6,
 				"file" : 2,
 				"line" : 290,
 				"parent" : 1
@@ -73,6 +98,10 @@
 			[
 				{
 					"fragment" : "-g -fPIC -fvisibility=hidden"
+				},
+				{
+					"backtrace" : 8,
+					"fragment" : "-fopenmp"
 				}
 			],
 			"defines" : 
@@ -84,12 +113,12 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 5,
+					"backtrace" : 9,
 					"isSystem" : true,
 					"path" : "/usr/include/python3.12"
 				},
 				{
-					"backtrace" : 6,
+					"backtrace" : 10,
 					"isSystem" : true,
 					"path" : "/home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include"
 				}
@@ -109,6 +138,16 @@
 			{
 				"fragment" : "",
 				"role" : "flags"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "/usr/lib/gcc/x86_64-linux-gnu/13/libgomp.so",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "/usr/lib/x86_64-linux-gnu/libpthread.a",
+				"role" : "libraries"
 			}
 		],
 		"language" : "CXX"

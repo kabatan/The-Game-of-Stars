@@ -1,5 +1,6 @@
 CMakeFiles/move_ver2.dir/move_ver2.cpp.o: \
  /home/kabatan/The-Game-of-Stars/move_ver2.cpp /usr/include/stdc-predef.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/omp.h \
  /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/pybind11.h \
  /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/detail/class.h \
  /home/kabatan/The-Game-of-Stars/.venv/lib/python3.12/site-packages/pybind11/include/pybind11/attr.h \
@@ -407,4 +408,8 @@ CMakeFiles/move_ver2.dir/move_ver2.cpp.o: \
  /usr/include/c++/13/bits/random.tcc /usr/include/c++/13/numeric \
  /usr/include/c++/13/bits/stl_numeric.h \
  /usr/include/c++/13/pstl/glue_numeric_defs.h /usr/include/c++/13/queue \
- /usr/include/c++/13/bits/stl_queue.h /usr/include/c++/13/chrono
+ /usr/include/c++/13/bits/stl_queue.h /usr/include/c++/13/chrono \
+ /usr/include/c++/13/fstream /usr/include/c++/13/bits/codecvt.h \
+ /usr/include/x86_64-linux-gnu/c++/13/bits/basic_file.h \
+ /usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h \
+ /usr/include/c++/13/bits/fstream.tcc
